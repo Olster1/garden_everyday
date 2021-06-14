@@ -465,7 +465,7 @@ static void writeFooter(FileState *state) {
 			
 	//Add meta generated files
 	char *exts[] = { "js" };
-	FileNameOfType filesToConvert = getDirectoryFilesOfType("/public/js_components/", exts, 1);
+	FileNameOfType filesToConvert = getDirectoryFilesOfType("../public/js_components/", exts, 1);
 
 	for(int fileIndex = 0; fileIndex < filesToConvert.count; ++fileIndex) {
 		char * javascriptStr = "<script src='/js_components/";
