@@ -1,0 +1,10 @@
+*.exe
+*.obj
+*.ilk
+*.pdb
+*.sln
+
+.env
+/node_modules
+
+.vs/

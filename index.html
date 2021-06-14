@@ -1,0 +1,28 @@
+<h1>HOMEPAGE</h1>
+<input id='email_input' type='email'/>
+<button onclick="testEmail()">Click me</button>
+
+
+
+
+<script>
+
+	///////////////////////************ Our api *************////////////////////
+
+	function mycallback(result, message, data) {
+		console.log(result);
+		console.log(message);
+		console.log(data);
+	}
+
+	function testEmail() {
+		let emailTo = document.getElementById('email_input').value;
+
+		let request = buildPostRequest('http://localhost:8080/add_to_email_list', {
+				emailTo: emailTo
+			});
+
+		sendRequest(request, mycallback)
+	}
+
+</script>

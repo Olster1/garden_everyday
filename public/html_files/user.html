@@ -1,0 +1,12 @@
+<!DOCTYPE html>	<html lang="en">		<head>		  <title>Goals Everyday</title>		  <meta charset="utf-8">		  <meta name="viewport" content="width=device-width, initial-scale=1">		  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">		  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">		  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>		  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>		  <link rel="stylesheet" type="text/css" href="/style.css">		  <link rel="shortcut icon" type="image/png" href="/images/logo.png"/>		</head><nav class="navbar navbar-default" style="background-color: white; color: #f5f6f7;">	  <div class="container">	    <div class="navbar-header">	      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">	        <span class="icon-bar"></span>	        <span class="icon-bar"></span>	        <span class="icon-bar"></span>	      </button>	      <a class="navbar-left" href="/index"><img style="width: 2cm;" src="/images/logo.png"></a>	    </div>	    <div class="collapse navbar-collapse" id="myNavbar">	      <ul id="my-navbar-id" class="nav navbar-nav navbar-right"  style="margin-top: 25px;">	      </ul>	    </div>	  </div>	</nav>	<body>	<div id="main-page" style="display: none;" class="container"><div class="row">
+<div class="col-sm-10 col-md-12 col-lg-12">
+<div class="info-card">
+<h1>Your Goals</h1><h2>Welcome Back <span id='inline-var-id-0'></span>!</h2>
+<div id="goals"></div>
+<div id='loading-progress-goals'></div><hr><h3>Create New Goal</h3><h4>Goal Name</h4><input class='my-text-input' id='name_input' type='text' style='margin-left: 0; margin-right: 0;'/><h4>Objective</h4><input class='my-text-input' id='objective_input' type='text' style='margin-left: 0; margin-right: 0;'/><div id='loading-progress'></div><button class='my-button-class' onclick='createGoal()'>Create Goal</button></div>
+</div>
+</div>
+<br><script src='/scripts/fetchApi.js'></script><script src='/scripts/user.js'></script><script src='/scripts/getUserInfoOnPageLoad.js'></script><script src='/scripts/isUserArea.js'/></script>
+<script src='/scripts/goals.js'/></script>
+<script> function onLoadAddInlineVariables() {document.getElementById('inline-var-id-0').textContent = user.name;}</script>
+</div><div id='main-page-loader'></div></body></html>

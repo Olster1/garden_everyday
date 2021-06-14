@@ -1,0 +1,167 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+body {
+  font: 15px 'Montserrat', sans-serif;
+  line-height: 1.7;
+  /*background-image: url("alchemy.gif");*/
+  background-repeat: repeat;
+}
+
+hr {
+    display: block; 
+    height: 0.5cm;
+    border: 0; 
+    border-top: 1px solid #000080;
+    thickness: 1cm;
+    margin: 1em 0; 
+    padding: 0; 
+}
+
+h1 {
+  padding: 0.2cm;
+}
+
+h2 {
+  font-size: 26px;
+  padding: 0.3cm;
+}
+
+h3 {
+  padding: 0.2cm;
+}
+
+h4 {
+  padding: 0.2cm;
+  font-size: 18px;
+}
+
+.info-card {
+	margin: 1em;
+	padding: 0;
+	background-color: white;
+
+  max-width: 25cm;
+}
+
+.photo-card {
+	margin-top: 2em;
+
+}
+
+.point {
+	padding-top: 2%;
+	padding-bottom: 2%;
+}
+
+.column {
+  float: left;
+  width: 50%;
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.code-block {
+  text-align: center;
+  background-color: #161616;
+  color: #A08563;
+  font-family: 'Roboto Mono', monospace;
+  width: 100%;
+}
+
+.code-block-left {
+  text-align: left;
+  padding: 1cm;
+  padding-top: 1%;
+  padding-bottom: 1%;
+  background-color: #161616;
+  color: #A08563;
+  font-family: 'Roboto Mono', monospace;
+  width: 100%;
+}
+
+.code-function-name {
+  color: red;
+}
+.code-variable-name {
+  color: green;
+}
+.code-comment-name {
+  color: gray;
+}
+
+.quiz-answer {
+  background-color: #FAE8E0;
+  padding: 0.1em;
+  border-radius: 0.7em;
+}
+
+.email-list {
+  text-align: center;
+  /*background-color: #ffcccc;*/
+  padding: 0.4cm;
+  border-radius: 0.2cm;
+}
+
+.subscribe-btn {
+  background-color: #FFE5B4;
+  padding: 0.6cm;
+  margin: 0.4cm;
+  border: none;
+  border-radius: 0.2cm;
+}
+
+.email-input-style {
+  display: inline; 
+  /*text-align: center;*/
+  padding: 0.3cm;
+  width: 7cm;
+  height: 1cm;
+}
+
+.loader {
+  text-align: center;
+  border: 0.25cm solid white; /* Light grey */
+  border-top: 0.25cm solid #f7dfd4; /* Blue */
+  border-radius: 50%;
+  width: 1cm;
+  height: 1cm;
+  animation: spin 2s linear infinite;
+  margin: auto;
+  margin-bottom: 0.3cm;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.my-text-input {
+  display: block;
+  margin: auto;
+  margin-top: 0.5cm;
+  margin-bottom: 0.5cm;
+}
+
+.rounded-card {
+  text-align: center;
+  border-radius: 0.3cm;
+  background-color: #f7dfd4;
+  padding: 0.3cm;
+  width: 70%;
+  min-width: 11cm;
+  margin: auto;
+  margin-top: 0.5cm;
+  margin-bottom: 0.5cm;
+  
+}
+
+.my-button-class {
+  padding: 0.3cm;
+}
