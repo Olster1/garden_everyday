@@ -75,7 +75,7 @@ router.post('/updateGoal', checkToken, (req, httpRes, next) => {
 			return next(err);
 		}
 		if(documentResult != null) { //found the goal
-			milestoneModel.updateOne({ _id: goalId }, {name: name, objective: objective, ownerId: ownerId,  complete: complete, updated_at: new Date() }, (err2, documentResult) => {
+			goalModel.updateOne({ _id: goalId }, {name: name, objective: objective, ownerId: ownerId,  complete: complete, updated_at: new Date() }, (err2, documentResult) => {
 				if(err2) {
 					return next(err2);
 				} else {
@@ -85,6 +85,12 @@ router.post('/updateGoal', checkToken, (req, httpRes, next) => {
 						message: 'updated successful',
 					});
 				}
+			});
+		} else {
+			httpRes.json({
+				result: constants.ERROR,
+				data: {},
+				message: 'Goal Doesnt Exist',
 			});
 		}
 	});

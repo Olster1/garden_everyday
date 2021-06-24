@@ -27,8 +27,14 @@ struct HtmlNode {
 	int clickCount;
 	char *onClickFunctions[64];
 
+	int checkedCount;
+	char *checkedValues[2];
+
 	int srcCount;
 	char *srcs[64];
+
+	int typeCount;
+	char *types[2];
 
 		
 	//NOTE: 1 Dimensional tree to pop back up to last parent
@@ -48,6 +54,17 @@ static void pushClass(HtmlNode *node, char *name) {
 	assert(node->classCount < arrayCount(node->classes))
 	node->classes[node->classCount++] = name;
 }
+
+static void pushType(HtmlNode *node, char *name) {
+	assert(node->typeCount < arrayCount(node->types))
+	node->types[node->typeCount++] = name;
+}
+
+static void pushCheckedValue(HtmlNode *node, char *name) {
+	assert(node->checkedCount < arrayCount(node->checkedValues))
+	node->checkedValues[node->checkedCount++] = name;
+}
+
 
 static void pushSrc(HtmlNode *node, char *name) {
 	assert(node->srcCount < arrayCount(node->srcs))
@@ -90,8 +107,24 @@ static HtmlNode *pushHtmlNode(FileState *state, char *nodeType, char *varName) {
 }
 
 static void pushInputVar(FileState *state, char *name) {
-	assert(state->inputVariableCount < arrayCount(state->inputVariables))
-	state->inputVariables[state->inputVariableCount++] = name;
+	char *name_trimmed = name;
+
+	//NOTE: We trim the string of any whitespace to see if it matches 'this' keyword. If so we don't want to add it as an imput variable
+	name_trimmed = lexEatWhiteSpace(name_trimmed);
+
+	char *at = name_trimmed; //end string
+	while(!(*at == ' ' || *at == '\r' || *at == '\n' || *at == '\t' || *at == '\0')) {
+	    at++;		
+	}
+	at[0] = '\0';
+
+	/////
+
+	//NOTE: Don't add this as a keyword
+	if(!cmpStrNull("this", name_trimmed)) {
+		assert(state->inputVariableCount < arrayCount(state->inputVariables));
+		state->inputVariables[state->inputVariableCount++] = name;
+	}
 }
 
 static void initFileState(FileState *state) {
@@ -261,6 +294,26 @@ int main(int argc, char **args) {
 			    				
 			    		}
 
+    		    		for(int i = 0; i < openNode->checkedCount; ++i) {
+    		    			char *str = "element";
+    		    			addElementInifinteAllocWithCount_(&state.contentsToWrite, str, easyString_getSizeInBytes_utf8(str));
+
+    		    			//Unique element id
+    		    			char strBuffer[512];
+    		    			sprintf_s(strBuffer, arrayCount(strBuffer), "%d", state.elementCount);
+    		    			addElementInifinteAllocWithCount_(&state.contentsToWrite, strBuffer, easyString_getSizeInBytes_utf8(strBuffer));
+
+    		    			str = ".checked = ";
+    		    			addElementInifinteAllocWithCount_(&state.contentsToWrite, str, easyString_getSizeInBytes_utf8(str));
+
+    		    			str = openNode->checkedValues[i];
+    		    			addElementInifinteAllocWithCount_(&state.contentsToWrite, str, easyString_getSizeInBytes_utf8(str));
+    						
+    						str = ";\n";
+    						addElementInifinteAllocWithCount_(&state.contentsToWrite, str, easyString_getSizeInBytes_utf8(str));
+    		    				
+    		    		}
+
     		    		for(int i = 0; i < openNode->srcCount; ++i) {
     		    			char *str = "element";
     		    			addElementInifinteAllocWithCount_(&state.contentsToWrite, str, easyString_getSizeInBytes_utf8(str));
@@ -279,8 +332,27 @@ int main(int argc, char **args) {
     						str = "\";\n";
     						addElementInifinteAllocWithCount_(&state.contentsToWrite, str, easyString_getSizeInBytes_utf8(str));
     		    				
-    		    		}
+    		    		}	
 
+    		    		for(int i = 0; i < openNode->typeCount; ++i) {
+    		    			char *str = "element";
+    		    			addElementInifinteAllocWithCount_(&state.contentsToWrite, str, easyString_getSizeInBytes_utf8(str));
+
+    		    			//Unique element id
+    		    			char strBuffer[512];
+    		    			sprintf_s(strBuffer, arrayCount(strBuffer), "%d", state.elementCount);
+    		    			addElementInifinteAllocWithCount_(&state.contentsToWrite, strBuffer, easyString_getSizeInBytes_utf8(strBuffer));
+
+    		    			str = ".setAttribute('type',\"";
+    		    			addElementInifinteAllocWithCount_(&state.contentsToWrite, str, easyString_getSizeInBytes_utf8(str));
+
+    		    			str = openNode->types[i];
+    		    			addElementInifinteAllocWithCount_(&state.contentsToWrite, str, easyString_getSizeInBytes_utf8(str));
+    						
+    						str = "\");\n";
+    						addElementInifinteAllocWithCount_(&state.contentsToWrite, str, easyString_getSizeInBytes_utf8(str));
+    		    				
+    		    		}
 
     		    		for(int i = 0; i < openNode->clickCount; ++i) {
     		    			char *str = "element";
@@ -430,8 +502,29 @@ int main(int argc, char **args) {
 		    	} break;
 		    	case TOKEN_WORD: {
 		    		if(openNode) {
+		    			
 		    			//NOTE: Get all the classes
-		    			if(stringsMatchNullN("class", token.at, token.size)) {
+		    			if(stringsMatchNullN("type", token.at, token.size)) {
+		    				EasyToken token = lexGetNextToken(&tokenizer);
+		    				assert(token.type == TOKEN_EQUALS);
+
+		    				token = lexGetNextToken(&tokenizer);
+		    				assert(token.type == TOKEN_STRING);
+
+		    				//NOTE: create new tokenizer
+	    					bool parsing = true;
+	    				    EasyTokenizer tokenizer = lexBeginParsing((char *)(token.at), EASY_LEX_OPTION_EAT_WHITE_SPACE); 
+
+		    				while(*tokenizer.src != '"' && *tokenizer.src != '\'') {
+		    					token = lexGetNextToken(&tokenizer);
+		    					assert(token.type == TOKEN_WORD);
+
+		    					pushType(openNode, nullTerminate(token.at, token.size));
+
+		    					tokenizer.src = lexEatWhiteSpace(tokenizer.src);
+		    				}
+
+		    			} else if(stringsMatchNullN("class", token.at, token.size)) {
 		    				EasyToken token = lexGetNextToken(&tokenizer);
 		    				assert(token.type == TOKEN_EQUALS);
 
@@ -462,6 +555,40 @@ int main(int argc, char **args) {
 		    				char *name = nullTerminate(token.at, token.size);
 
 		    				pushSrc(openNode, name);
+
+		    			} else if(stringsMatchNullN("checked", token.at, token.size)) {
+		    				//NOTE: Get the src
+		    				EasyToken token = lexGetNextToken(&tokenizer);
+		    				assert(token.type == TOKEN_EQUALS);
+
+		    				token = lexGetNextToken(&tokenizer);
+
+		    				char *name = 0;
+		    				if(token.type == TOKEN_STRING) {
+		    					name = nullTerminate(token.at, token.size);
+		    				} else if(token.type == TOKEN_OPEN_BRACKET) {
+		    					token = lexGetNextToken(&tokenizer);
+
+		    					char *at = token.at;
+
+		    					while(*at != '\0' && *at != '}') { //NOTE: Keep going till you hit an end curly brace
+		    						at++;
+		    					}
+
+		    					name = nullTerminate(token.at, (at - token.at));
+
+		    					if(*at == '}') {
+		    						at++;
+		    					}
+
+		    					tokenizer.src = at;
+		    					
+		    					pushInputVar(&state, name);
+		    				} else {
+		    					assert(false);
+		    				}
+		    				
+		    				pushCheckedValue(openNode, name);
 		    				
 		    			} else if(stringsMatchNullN("style", token.at, token.size)) {
 		    				//NOTE: Get all the styles

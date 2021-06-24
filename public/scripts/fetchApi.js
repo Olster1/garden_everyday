@@ -24,13 +24,32 @@ function buildPostRequest(url, data) {
 	return request;
 }
 
-function sendRequest(request, callback) {
+function buildGetRequest(url) {
+	const myHeaders = new Headers();
+	
+	const request = new Request(url, {
+		method: 'GET',
+		mode: 'cors',
+		headers: myHeaders
+
+	});
+
+	return request;
+}
+
+
+function sendRequest(request, callback, dataCount) {
 	fetch(request)
 	.then(handle500Error)
 	.then((resp) => resp.json())
 	.then((data) => {
 		console.log(data);
-		callback(data.result, data.message, data.data);
+		if(dataCount === 1) {
+			callback(data);	
+		} else {
+			callback(data.result, data.message, data.data);	
+		}
+		
 	}).catch((error) => {
 		console.log(error);
 		callback("ERROR", "Server error", {});

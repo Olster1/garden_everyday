@@ -11,6 +11,5 @@
 
 #END_ROUNDED_CARD
 
-
 #JAVASCRIPT isOpenArea
 #JAVASCRIPT register_login

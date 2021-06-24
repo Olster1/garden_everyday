@@ -4,9 +4,9 @@
 #TITLE Register
 
 
-#INPUT name_input text
-#INPUT email_input email
-#INPUT password_input password
+#INPUT name_input_register text
+#INPUT email_input_register email
+#INPUT password_input_register password
 #DIV loading-progress
 
 #BUTTON register() Register

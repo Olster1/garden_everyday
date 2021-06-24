@@ -8,6 +8,37 @@
 
 
 let goalElms = {};
+let userGardenSettings = {};
+
+function getUserSettings() {
+
+  startLoadingSpinner("loading-progress");
+
+  const plantDivParent = document.getElementById('plant-names-div');
+
+  let request = buildPostRequest('/userGardenSettings/getUserSettings', {});
+
+  sendRequest(request, (result, message, data) => {
+      console.log(result);
+      console.log(message);
+      console.log(data);
+
+      if(result === "SUCCESS") {
+
+        //NOTE: Assign the user data
+        userGardenSettings = data;
+        stopLoadingSpinner("loading-progress");
+
+        if(userGardenSettings.gpsSet) {
+          checkWeather(userGardenSettings.latitude, userGardenSettings.longitude);  
+        }
+       
+      } else {
+        plantDivParent.innerHTML = message;
+      }
+  
+  });
+} 
 
 function createGoal() {
 
@@ -105,5 +136,19 @@ function getGoalsForUser() {
 	});
 }
 
+function checkWeather(lat, long) {
+
+  let request = buildGetRequest('https://api.openweathermap.org/data/2.5/weather?lat=' + lat + '&lon=' + long + '&appid=3a83cfadb21fb56f624d7136e09551b0');
+
+  sendRequest(request, (data) => {
+    console.log(data);
+      const warningsDivParent = document.getElementById('warnings');
+      warningsDivParent.innerHTML = "It's " + (data.main.temp - 273).toFixed(2) + " degrees celcius today";
+  }, 1);
+  
+
+}
+
 
 onFinishLoad.push(getGoalsForUser);
+onFinishLoad.push(getUserSettings);

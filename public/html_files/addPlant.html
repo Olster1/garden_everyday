@@ -1,20 +1,9 @@
 <!DOCTYPE html>	<html lang="en">		<head>		  <title>Garden Everyday</title>		  <meta charset="utf-8">		  <meta name="viewport" content="width=device-width, initial-scale=1">		  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">		  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">		  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>		  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>		  <link rel="stylesheet" type="text/css" href="/style.css">		  <link rel="shortcut icon" type="image/png" href="/images/logo.png"/>		</head><nav class="navbar navbar-default" style="background-color: white; color: #f5f6f7;">	  <div class="container">	    <div class="navbar-header">	      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">	        <span class="icon-bar"></span>	        <span class="icon-bar"></span>	        <span class="icon-bar"></span>	      </button>	      <a class="navbar-left" href="/index"><img style="width: 2cm;" src="/images/logo.png"></a>	    </div>	    <div class="collapse navbar-collapse" id="myNavbar">	      <ul id="my-navbar-id" class="nav navbar-nav navbar-right"  style="margin-top: 25px;">	      </ul>	    </div>	  </div>	</nav>	<body>	<div id="main-page" style="display: none;" class="container"><div class="row">
 <div class="col-sm-10 col-md-12 col-lg-12">
 <div class="info-card">
-<h1>Let's Get Gardening!</h1><h2>Welcome Back <span id='inline-var-id-0'></span></h2>
-<div id="warnings"></div>
-<h3>What you should be <b>propagating</b></h3>
-<div id="propagating"></div>
-<hr><h3>What you should be <b>planting</b></h3>
-<div id="planting"></div>
-<hr><h3>What should be <b>growing</b></h3>
-<div id="propagating"></div>
-<hr><h3>What you should be <b>picking</b></h3>
-<div id="planting"></div>
-<div id='loading-progress'></div></div>
+<h1>Create Plant</h1><h4>Common Name</h4><input class='my-text-input' id='common_name_input' type='text' style='margin-left: 0; margin-right: 0;'/><h4>Latin Name</h4><input class='my-text-input' id='latin_name_input' type='text' style='margin-left: 0; margin-right: 0;'/><h4>Propagation Method</h4><input class='my-text-input' id='prop_method_name_input' type='text' style='margin-left: 0; margin-right: 0;'/><h3>Time Of Year To Plant</h3><h3>Cool</h3><input class='my-text-input' id='cool_year_to_plant_input' type='text' style='margin-left: 0; margin-right: 0;'/><h3>Mediteranean</h3><input class='my-text-input' id='med_year_to_plant_input' type='text' style='margin-left: 0; margin-right: 0;'/><h3>Sub Tropical</h3><input class='my-text-input' id='sub_trop_year_to_plant_input' type='text' style='margin-left: 0; margin-right: 0;'/><h3>Tropical</h3><input class='my-text-input' id='trop_year_to_plant_input' type='text' style='margin-left: 0; margin-right: 0;'/><div id='loading-progress'></div><button class='my-button-class' onclick='AddPlant()'>Add Plant</button></div>
 </div>
 </div>
-<br><script src='/js_components/meta_goal.js'></script><script src='/js_components/meta_plant_tick_box.js'></script><script src='/scripts/fetchApi.js'></script><script src='/scripts/user.js'></script><script src='/scripts/getUserInfoOnPageLoad.js'></script><script src='/scripts/isUserArea.js'/></script>
-<script src='/scripts/gardenUser.js'/></script>
-<script> function onLoadAddInlineVariables() {document.getElementById('inline-var-id-0').textContent = user.name;}</script>
+<br><script src='/js_components/meta_goal.js'></script><script src='/js_components/meta_plant_tick_box.js'></script><script src='/scripts/fetchApi.js'></script><script src='/scripts/user.js'></script><script src='/scripts/getUserInfoOnPageLoad.js'></script><script src='/scripts/addPlant.js'/></script>
+<script> function onLoadAddInlineVariables() {}</script>
 </div><div id='main-page-loader'></div></body></html>

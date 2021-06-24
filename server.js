@@ -2,13 +2,14 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const cors = require('cors');
-const nodemailer = require('nodemailer');
 
 const mongoose = require('mongoose');
 const mongodb = require('mongodb');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const bcrypt  = require('bcrypt');
+
+const sgMail = require('@sendgrid/mail')
 
 const { checkToken } = require('./utils/auth.js')
 
@@ -25,36 +26,27 @@ app.use(cors());
 if(!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
 	const result = require('dotenv').config();
 	// console.log(result);
-
 } 
 
 ///////////////////////************ ROUTERS *************////////////////////
 
 const userRouter = require(path.resolve(__dirname, 'routes/user.js'))
 const goalRouter = require(path.resolve(__dirname, 'routes/goal.js'))
+const plantRouter = require(path.resolve(__dirname, 'routes/plant.js'))
+const userSettingsRouter = require(path.resolve(__dirname, 'routes/user_settings.js'))
 const verifyRegisterRouter = require(path.resolve(__dirname, 'routes/verify-register.js'))
 
  
 ////////////////////////////////////////////////////////////////////
 
-const userModel = require(path.resolve(__dirname, 'models/users.js'));
-const goalModel = require(path.resolve(__dirname, 'models/goals.js'));
+// const userModel = require(path.resolve(__dirname, 'models/users.js'));
+// const goalModel = require(path.resolve(__dirname, 'models/goals.js'));
+// const plantModel = require(path.resolve(__dirname, 'models/plant.js'));
+// const userSettingsModel = require(path.resolve(__dirname, 'models/user_settings.js'));
 
 //NOTE: For Node Mailer
 
-let transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
-    requireTLS: true,
-    auth: {
-        user: 'ollietheexplorer@gmail.com',
-        pass: 'Banjo4852'
-    }
-});
-
-
-
+sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
 ////////////// APP INITIED //////////////////
 
@@ -87,7 +79,8 @@ mongoose.connect(process.env.DB_CONNECTION_STRING, { useNewUrlParser: true, useU
 
 app.use('/user', userRouter);
 app.use('/goal', goalRouter);
-
+app.use('/userGardenSettings', userSettingsRouter);
+app.use('/plant', plantRouter);
 
 
 ////////////////////////////// error handlers for the POST routes //////////////////////////////////////
@@ -112,30 +105,20 @@ app.use((error, req, res, next) => {
 
 app.post('/build_numerology_pdf', (req, res, next) => {
 
-	const mailOptions = {
-	  from: 'ollietheexplorer@gmail.com',
-	  to: req.body.emailTo,
-	  subject: 'Sending Email using Node.js',
-	  text: '<h1>This is the header</h1><p>This is the body</p>',
-	  attachments: [{
-	    filename: 'unique_numerology.pdf',
-	    path: 'C:/Users/olive/Desktop/oliver_immunisation.pdf',
-	    contentType: 'application/pdf'
-	  }]
-	};
+	// const mailOptions = {
+	//   from: 'ollietheexplorer@gmail.com',
+	//   to: req.body.emailTo,
+	//   subject: 'Sending Email using Node.js',
+	//   text: '<h1>This is the header</h1><p>This is the body</p>',
+	//   attachments: [{
+	//     filename: 'unique_numerology.pdf',
+	//     path: 'C:/Users/olive/Desktop/oliver_immunisation.pdf',
+	//     contentType: 'application/pdf'
+	//   }]
+	// };
 
 
-	transporter.sendMail(mailOptions, function(error, info){
-	  if (error) {
-	    return next(error);
-	  } else {
-	    res.json({
-    		result: 'SUCCESS',
-    		data: {},
-    		message: "Sent Mail to " + req.body.emailTo
-    	});
-	  }
-	});
+	
 });
 
 
@@ -159,10 +142,6 @@ app.post('/add_to_email_list', (req, res, next) => {
 // 		message: 'Priates are attacking NOW!'
 // 	});
 // });
-
-
-
-
 
 
 app.post('/addTodo', (req, res, next) => {

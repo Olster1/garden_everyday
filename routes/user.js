@@ -6,22 +6,12 @@ const constants = require('../utils/constants');
 const { checkToken, checkNoToken } = require('../utils/auth');
 const path = require('path');
 const crypto = require('crypto'); 
-const nodemailer = require('nodemailer');
+const sgMail = require('@sendgrid/mail')
 
 const userModel = require(path.resolve(__dirname, '../models/users.js'));
+const userSetModel = require(path.resolve(__dirname, '../models/user_settings.js'));
 
 var router = express.Router();
-
-let transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
-    requireTLS: true,
-    auth: {
-        user: 'ollietheexplorer@gmail.com',
-        pass: 'Banjo4852'
-    }
-});
 
 
 function initUserSession(httpRes, documentResult) {
@@ -160,20 +150,23 @@ router.post('/register', checkNoToken, (req, httpRes, next) => {
 			const verificationUrl = 'https://' + req.headers.host + '/verify-register/' + email + '/' + verificationHash;
 
 			/////////////////////////////////////////////////////
-			const mailOptions = {
-			  from: 'ollietheexplorer@gmail.com',
-			  to: email,
+
+			const msg = {
+			  to: email, // Change to your recipient
+			  from: 'ollietheexplorer@gmail.com', // Change to your verified sender
 			  subject: 'Verify your Goals Everyday Account',
 			  html: "Hi " + name + "! Thank you for registering with Goals Everyday! To verify your account please <a href='" + verificationUrl + "'>click here<a>.\n I this doesn't work copy and paste this address: " + verificationUrl
-			};
+			}
 
-
-			transporter.sendMail(mailOptions, function(error, info){
-			  if (error) {
+			sgMail
+			  .send(msg)
+			  .then((response) => {
+			    console.log(response[0].statusCode)
+			    console.log(response[0].headers)
+			  })
+			  .catch((error) => {
 			    return next(error);
-			  } 
-
-			});
+			  })
 
 			////////////////////////////////////////////////////////////
 
@@ -199,12 +192,45 @@ router.post('/register', checkNoToken, (req, httpRes, next) => {
 				//NOTE: Don't init user session since they have to verify their account first.
 				// initUserSession(httpRes, result);
 
-				//NOTE(ol): Username is taken already
-				httpRes.json({
-	    			result: constants.SUCCESS,
-					data: {},
-					message: 'Account succesfully registered.',
-	    		});
+				//NOTE: Default settings
+				const userSet = new userSetModel({
+					climateRegion: "DEFAULT",
+					latitude: 0,
+					longitude: 0,
+					plantIds: [],
+					ownerId: result._id,
+					gpsSet: false
+				});
+
+				userSetModel.findOne({ ownerId: result._id }, (err, documentResult) => {
+					if(err) {
+						return next(err);
+					}
+					if(documentResult == null) { //found the settings
+
+						userSet.save((err2, result) => {
+							if(err2) {
+								httpRes.json({
+									result: constants.ERROR,
+									data: {},
+									message: 'error saving',
+								});
+							} else {
+								httpRes.json({
+					    			result: constants.SUCCESS,
+									data: {},
+									message: 'Account succesfully registered.',
+					    		});
+							}
+						});
+					} else {
+						httpRes.json({
+			    			result: constants.ERROR,
+							data: {},
+							message: 'User Settings Already Exist. Something went wrong.',
+			    		});
+					}
+				});
 
 			});
 

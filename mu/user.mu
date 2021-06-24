@@ -1,30 +1,44 @@
 
 #CARD
-#TITLE Your Goals
+#TITLE Let's Get Gardening!
 
-##Welcome Back {user.name}!
+##Welcome Back {user.name}
 
 #HTML
-<div id="goals"></div>
+<div id="user-error-message"></div>
 #ENDHTML
-#DIV loading-progress-goals 
+
+#HTML
+<div id="warnings"></div>
+#ENDHTML
+
+###What you should be <b>propagating</b>
+#HTML
+<div id="propagating"></div>
+#ENDHTML
+
+#HR
+
+###What you should be <b>planting</b>
+#HTML
+<div id="planting"></div>
+#ENDHTML
 
 #HR 
 
-###Create New Goal
+###What should be <b>growing</b>
+#HTML
+<div id="propagating"></div>
+#ENDHTML
 
+#HR
 
-####Goal Name
-
-#INPUT name_input text margin-left: 0; margin-right: 0;
-
-####Objective
-
-#INPUT objective_input text margin-left: 0; margin-right: 0;
+###What you should be <b>picking</b>
+#HTML
+<div id="planting"></div>
+#ENDHTML
 
 #DIV loading-progress 
 
-#BUTTON createGoal() Create Goal
-
 #JAVASCRIPT isUserArea
-#JAVASCRIPT goals
+#JAVASCRIPT gardenUser
