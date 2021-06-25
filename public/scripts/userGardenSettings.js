@@ -63,7 +63,41 @@ function getUserSettings() {
         //NOTE: Assign the user data
         userGardenSettings = data;
 
-        document.getElementById('gps-metadata').innerHTML = userGardenSettings.longitude + ', ' + userGardenSettings.latitude;
+        // document.getElementById('gps-metadata').innerHTML = userGardenSettings.longitude + ', ' + userGardenSettings.latitude;
+
+        if(typeof(userGardenSettings.address1) !== 'undefined') {
+          console.log(userGardenSettings.address1);
+          document.getElementById('addrs_1').value = userGardenSettings.address1;
+          document.getElementById('addrs_2').value = userGardenSettings.address2;
+          document.getElementById('suburb').value = userGardenSettings.suburb;
+          document.getElementById('state').value = userGardenSettings.state;
+          document.getElementById('postcode').value = userGardenSettings.postcode;
+        }   
+
+        let climateIndex = 0;
+        let climateString = userGardenSettings.climateRegion;
+
+        console.log(climateString);
+
+
+        if(climateString === "temperate") {
+          climateIndex = 1;
+        } else if(climateString === "arid") {
+          climateIndex = 2;
+        } else if(climateString === "semiarid") {
+          climateIndex = 3;
+        } else if(climateString === "subtropical") {
+          climateIndex = 4;
+        } else if(climateString === "tropical") {
+          climateIndex = 5;
+        }
+
+
+        document.getElementById('select-climate-zone-id').value = climateIndex;
+
+
+        // document.getElementById('gps-metadata').innerHTML = metaData.longitude + ', ' + metaData.latitude;
+
 
         stopLoadingSpinner("loading-progress");
         //NOTE: Get the plant names now
@@ -93,6 +127,9 @@ function saveSettings() {
 
           stopLoadingSpinner("save-progress");
 
+          greenTick_activate("saveTick");   
+
+
           } else {
           plantDivParent.innerHTML = message;
         }
@@ -104,6 +141,8 @@ function getPlantNames() {
   startLoadingSpinner("loading-progress-plant-names");
 
 	const plantDivParent = document.getElementById('plant-names-div');
+  const herbDivParent = document.getElementById('herbs-names-div');
+  const treeDivParent = document.getElementById('trees-names-div');
 
 	let request = buildPostRequest('/plant/getAllCommonPlantNames', {});
 
@@ -117,15 +156,45 @@ function getPlantNames() {
         stopLoadingSpinner("loading-progress-plant-names");
 
   			data.map((plant) => {
-          // console.log(plant._id);
-          // console.log(plant.CommonName);
+
           let isChecked = userGardenSettings.plantIds.includes(plant._id);
-  				let parent = meta_create_plant_tick_box(plantDivParent, isChecked, plant._id, plant.CommonName);
+          let divToPlaceIn = plantDivParent;
+          if(plant.Type === "herb") {
+            divToPlaceIn = herbDivParent;
+          } else if(plant.Type === "tree") {
+            divToPlaceIn = treeDivParent;
+          }
+
+  				let parent = meta_create_plant_tick_box(divToPlaceIn, isChecked, plant._id, plant.CommonName);
   			});
   		} else {
   			plantDivParent.innerHTML = message;
   		}
 	});
+}
+
+
+function updateClimateZone(elm) {
+  greenTick_activate("climateTick");    
+
+  let climateString = "cool";
+  let indexAt = parseInt(elm.value);
+
+  if(indexAt === 1) {
+    climateString = "temperate";
+  } else if(indexAt === 2) {
+    climateString = "arid";
+  } else if(indexAt === 3) {
+    climateString = "semiarid";
+  } else if(indexAt === 4) {
+    climateString = "subtropical";
+  } else if(indexAt === 5) {
+    climateString = "tropical";
+  }
+
+  console.log(climateString);
+
+  userGardenSettings.climateRegion = climateString;
 }
 
 function downloadAddressFinder() {
@@ -149,12 +218,20 @@ function downloadAddressFinder() {
           document.getElementById('state').value = metaData.state_territory;
           document.getElementById('postcode').value = metaData.postcode;
 
-          document.getElementById('gps-metadata').innerHTML = metaData.longitude + ', ' + metaData.latitude;
+          // document.getElementById('gps-metadata').innerHTML = metaData.longitude + ', ' + metaData.latitude;
+
+          userGardenSettings.address1 = metaData.address_line_1;
+          userGardenSettings.address2 = metaData.address_line_2;
+          userGardenSettings.suburb = metaData.locality_name;
+          userGardenSettings.state = metaData.state_territory;
+          userGardenSettings.postcode = metaData.postcode;
 
           userGardenSettings.longitude = metaData.longitude;
           userGardenSettings.latitude = metaData.latitude;
 
-          userGardenSettings.gpsSet = true;          
+          userGardenSettings.gpsSet = true;     
+
+          greenTick_activate("locationTick");     
       });
   };
 

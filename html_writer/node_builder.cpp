@@ -13,6 +13,11 @@ typedef struct {
 	char *value;
 } HtmlStyle;
 
+typedef struct {
+	bool isVar;
+	char *str;
+} SrcInfo;
+
 struct HtmlNode {
 	char *nodeType; //Div or Button or <p> etc.
 
@@ -31,7 +36,7 @@ struct HtmlNode {
 	char *checkedValues[2];
 
 	int srcCount;
-	char *srcs[64];
+	SrcInfo srcs[64];
 
 	int typeCount;
 	char *types[2];
@@ -66,9 +71,13 @@ static void pushCheckedValue(HtmlNode *node, char *name) {
 }
 
 
-static void pushSrc(HtmlNode *node, char *name) {
-	assert(node->srcCount < arrayCount(node->srcs))
-	node->srcs[node->srcCount++] = name;
+static void pushSrc(HtmlNode *node, char *name, bool isVar) {
+	assert(node->srcCount < arrayCount(node->srcs));
+	SrcInfo srcInfo;
+	srcInfo.str = name;
+	srcInfo.isVar = isVar;
+
+	node->srcs[node->srcCount++] = srcInfo;
 }
 
 
@@ -122,8 +131,22 @@ static void pushInputVar(FileState *state, char *name) {
 
 	//NOTE: Don't add this as a keyword
 	if(!cmpStrNull("this", name_trimmed)) {
-		assert(state->inputVariableCount < arrayCount(state->inputVariables));
-		state->inputVariables[state->inputVariableCount++] = name;
+
+		bool hasBeenAdded = false;
+		//NOTE: Make sure it hasn't been added yet
+		for(int i = 0; i < state->inputVariableCount && !hasBeenAdded; ++i) {
+			char *varName = state->inputVariables[i];
+
+			if(cmpStrNull(varName, name_trimmed)) {
+				hasBeenAdded = true;
+				break;
+			}
+		}
+
+		if(!hasBeenAdded) {
+			assert(state->inputVariableCount < arrayCount(state->inputVariables));
+			state->inputVariables[state->inputVariableCount++] = name;
+		}
 	}
 }
 
@@ -197,7 +220,14 @@ int main(int argc, char **args) {
 	    HtmlNode *openNode = 0;
 
 	    while(parsing) {
-	    	EasyToken token = lexGetNextToken(&tokenizer);
+	    	EasyToken token;
+
+	    	if(openNode) {
+	    		token = lexGetNextToken(&tokenizer);
+	    	} else {
+	    		token = lexGetNextToken_ignoreSingleQuotationAsString(&tokenizer);
+	    	}
+
 	    	switch(token.type) {
 		    	case TOKEN_NULL_TERMINATOR: {
 		    		parsing = false;
@@ -323,13 +353,24 @@ int main(int argc, char **args) {
     		    			sprintf_s(strBuffer, arrayCount(strBuffer), "%d", state.elementCount);
     		    			addElementInifinteAllocWithCount_(&state.contentsToWrite, strBuffer, easyString_getSizeInBytes_utf8(strBuffer));
 
-    		    			str = ".src = \"";
+    		    			str = ".src = ";
     		    			addElementInifinteAllocWithCount_(&state.contentsToWrite, str, easyString_getSizeInBytes_utf8(str));
 
-    		    			str = openNode->srcs[i];
+    		    			SrcInfo srcInfo = openNode->srcs[i];
+    		    			if(!srcInfo.isVar) {
+    		    				str = "\"";
+    		    				addElementInifinteAllocWithCount_(&state.contentsToWrite, str, easyString_getSizeInBytes_utf8(str));
+    		    			}
+
+    		    			str = srcInfo.str;
     		    			addElementInifinteAllocWithCount_(&state.contentsToWrite, str, easyString_getSizeInBytes_utf8(str));
     						
-    						str = "\";\n";
+    						if(!srcInfo.isVar) {
+    							str = "\"";
+    							addElementInifinteAllocWithCount_(&state.contentsToWrite, str, easyString_getSizeInBytes_utf8(str));
+    						}
+
+    						str = ";\n";
     						addElementInifinteAllocWithCount_(&state.contentsToWrite, str, easyString_getSizeInBytes_utf8(str));
     		    				
     		    		}	
@@ -550,11 +591,36 @@ int main(int argc, char **args) {
 		    				assert(token.type == TOKEN_EQUALS);
 
 		    				token = lexGetNextToken(&tokenizer);
-		    				assert(token.type == TOKEN_STRING);
-		    				
-		    				char *name = nullTerminate(token.at, token.size);
 
-		    				pushSrc(openNode, name);
+		    				bool isVar = false;
+		    				char *name = 0;
+		    				if(token.type == TOKEN_STRING) {
+		    					name = nullTerminate(token.at, token.size);
+		    				} else if(token.type == TOKEN_OPEN_BRACKET) {
+		    					token = lexGetNextToken(&tokenizer);
+
+		    					isVar = true;
+
+		    					char *at = token.at;
+
+		    					while(*at != '\0' && *at != '}') { //NOTE: Keep going till you hit an end curly brace
+		    						at++;
+		    					}
+
+		    					name = nullTerminate(token.at, (at - token.at));
+
+		    					if(*at == '}') {
+		    						at++;
+		    					}
+
+		    					tokenizer.src = at;
+		    					
+		    					pushInputVar(&state, name);
+		    				} else {
+		    					assert(false);
+		    				}
+		    				
+		    				pushSrc(openNode, name, isVar);
 
 		    			} else if(stringsMatchNullN("checked", token.at, token.size)) {
 		    				//NOTE: Get the src
@@ -678,7 +744,7 @@ int main(int argc, char **args) {
 
 		    			}
 		    		} else {
-		    			printf("%.*s\n", token.size, token.at);
+		    			printf("WORD TYPE: %.*s\n", token.size, token.at);
 		    			assert(token.type == TOKEN_WORD);
 
 		    			addElementInifinteAllocWithCount_(&state.contentsToWrite, state.currentNode->varName, easyString_getSizeInBytes_utf8(state.currentNode->varName));
@@ -697,7 +763,7 @@ int main(int argc, char **args) {
 		    	default: {
 		    		if(!openNode) {
 			    		// assert(false);
-			    		printf("%.*s\n", token.size, token.at);
+			    		printf("DEFAULT TYPE: %.*s\n", token.size, token.at);
 			    		addElementInifinteAllocWithCount_(&state.contentsToWrite, state.currentNode->varName, easyString_getSizeInBytes_utf8(state.currentNode->varName));
 
 

@@ -21,6 +21,10 @@ const bcrypt  = require('bcrypt');
 	name: {
 		type: String, 
 		required: true
+	},
+	setUpProfile: {
+		type: Boolean,
+		required: true
 	}
 
 });

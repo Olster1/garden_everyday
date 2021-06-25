@@ -19,7 +19,7 @@ router.post('/getAllCommonPlantNames', (req, httpRes, next) => {
 
 	const userId = req.userId;
 
-	plantModel.find({ }, { CommonName: 1 }, (err, documentResult) => {
+	plantModel.find({ }, { CommonName: 1, Type: 1 }, (err, documentResult) => {
 		if(err) {
 			return next(err);
 		}
@@ -79,7 +79,8 @@ router.post('/createPlant', checkToken, (req, httpRes, next) => {
 		CommonName: req.body.CommonName,
 		LatinName: req.body.LatinName,
 		PropagationMethod: req.body.PropagationMethod,
-		TimeOfYearToPlant: req.body.TimeOfYearToPlant
+		TimeOfYearToPlant: req.body.TimeOfYearToPlant,
+		Type: req.body.type
 	});
 
 	goal.save((err2, result) => {
@@ -107,14 +108,16 @@ router.post('/updatePlant', checkToken, (req, httpRes, next) => {
 	const LatinName = req.body.LatinName;
 	const PropagationMethod = req.body.PropagationMethod;
 	const TimeOfYearToPlant = req.body.TimeOfYearToPlant;
+	const plantType = req.body.type;
 	const plantId = req.body.plantId
+
 
 	plantModel.findOne({ _id: plantId }, (err, documentResult) => {
 		if(err) {
 			return next(err);
 		}
 		if(documentResult != null) { //found the goal
-			plantModel.updateOne({ _id: plantId }, {CommonName: CommonName, LatinName: LatinName, PropagationMethod: PropagationMethod,  TimeOfYearToPlant: TimeOfYearToPlant, updated_at: new Date() }, (err2, documentResult) => {
+			plantModel.updateOne({ _id: plantId }, {CommonName: CommonName, LatinName: LatinName, PropagationMethod: PropagationMethod,  TimeOfYearToPlant: TimeOfYearToPlant, Type: plantType, updated_at: new Date() }, (err2, documentResult) => {
 				if(err2) {
 					return next(err2);
 				} else {

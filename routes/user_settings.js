@@ -5,6 +5,7 @@ const { checkToken, checkNoToken } = require('../utils/auth');
 const path = require('path');
 
 const userSetModel = require(path.resolve(__dirname, '../models/user_settings.js'));
+const userModel = require(path.resolve(__dirname, '../models/users.js'));
 
 const router = express.Router();
 
@@ -108,10 +109,17 @@ router.post('/saveSettings', checkToken, (req, httpRes, next) => {
 		if(err2) {
 			return next(err2);
 		} else {
-			httpRes.json({
-				result: constants.SUCCESS,
-				data: {},
-				message: 'updated successful',
+			//NOTE: Save to database saying they've set up the profile now
+			userModel.updateOne({ _id: req.userId }, { setUpProfile: true }, (err3, documentResult) => {
+				if(err3) {
+					return next(err3);
+				} else {
+					httpRes.json({
+						result: constants.SUCCESS,
+						data: {},
+						message: 'updated successful',
+					});
+				}
 			});
 		}
 	});

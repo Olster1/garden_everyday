@@ -1,12 +1,37 @@
 <!DOCTYPE html>	<html lang="en">		<head>		  <title>Garden Everyday</title>		  <meta charset="utf-8">		  <meta name="viewport" content="width=device-width, initial-scale=1">		  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">		  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">		  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>		  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>		  <link rel="stylesheet" type="text/css" href="/style.css">		  <link rel="shortcut icon" type="image/png" href="/images/logo.png"/>		</head><nav class="navbar navbar-default" style="background-color: white; color: #f5f6f7;">	  <div class="container">	    <div class="navbar-header">	      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">	        <span class="icon-bar"></span>	        <span class="icon-bar"></span>	        <span class="icon-bar"></span>	      </button>	      <a class="navbar-left" href="/index"><img style="width: 2cm;" src="/images/logo.png"></a>	    </div>	    <div class="collapse navbar-collapse" id="myNavbar">	      <ul id="my-navbar-id" class="nav navbar-nav navbar-right"  style="margin-top: 25px;">	      </ul>	    </div>	  </div>	</nav>	<body>	<div id="main-page" style="display: none;" class="container"><div class="row">
 <div class="col-sm-10 col-md-12 col-lg-12">
 <div class="info-card">
-<h1>Where and What are you gardening <span id='inline-var-id-0'></span>?</h1><hr><h2>Where?</h2>
+<h1>Where and What are you gardening <span id='inline-var-id-0'></span>?</h1><hr><h2>Where are you Gardening?</h2><br>
 <div id="location-div">
-<img src='/images/AustralianClimateZoneMap.png'>
+<img src='/images/Australian-Climate-Map.jpg'>
+
+<ul>
+<li><strong><img loading="lazy" title="Australian Climate Guide" src="https://www.gardenexpress.com.au/wp-content/uploads/2014/08/climate_tropical.gif" alt="Australian Climate Guide" width="15" height="10"> Tropical</strong> – hot humid summer .</li>
+<li><strong><img loading="lazy" title="Australian Climate Guide" src="https://www.gardenexpress.com.au/wp-content/uploads/2014/08/climate_mild-tropical.gif" alt="Australian Climate Guide" width="15" height="10"> Sub Tropical</strong> – warm humid summer</li>
+<li><strong><img loading="lazy" title="Australian Climate Guide" src="https://www.gardenexpress.com.au/wp-content/uploads/2014/08/climate_semi-arid.gif" alt="Australian Climate Guide" width="15" height="10"> Semi-arid</strong> – hot dry summer, cold winter</li>
+<li><strong><img loading="lazy" title="Australian Climate Guide" src="https://www.gardenexpress.com.au/wp-content/uploads/2014/08/climate_arid.gif" alt="Australian Climate Guide" width="15" height="10"> Arid</strong> – hot dry summer, cold winter</li>
+<li><strong><img loading="lazy" title="Australian Climate Guide" src="https://www.gardenexpress.com.au/wp-content/uploads/2014/08/climate_temperate.gif" alt="Australian Climate Guide" width="15" height="10"> Temperate</strong> – warm summer, cool winter</li>
+<li><strong><img loading="lazy" title="Australian Climate Guide" src="https://www.gardenexpress.com.au/wp-content/uploads/2014/08/climate_cool.gif" alt="Australian Climate Guide" width="15" height="10"> Cool</strong> – mild-warm summer, cool winter</li>
+</ul>
+<br><h3>Australian Climate Guide</h3><p>Using the map above, establish which coloured region you will be growing in. This map is intended as a guide only as climatic conditions vary between specific locations. Factors such as local altitude, wind and the proximity of hills, mountains and bodies of water can cause variations from the generalised climate map. Based on your local conditions, make an appropriate choice of what climate you're growing in. Note also that although a plant may be listed as suitable for a particular region, it may still require protection from extremes such as frost, strong winds and extreme heat.</p><p>Remember that you can often extend the range of plants that you can grow by creating micro-climates within your garden. Planting under trees, beside brick walls or in the shelter of a building, on high or low points in the garden can all have an effect. Even planting by a pond or surrounded by rocks can be used to advantage.</p>
 </div>
 <div class='row'>
 	<div class='location-form-details col-md-6'>
+	<h3>What climate are you gardening in?</h3>
+	<p>This will be used to suggest when to propagate, plant and pick the plants you want to grow</p>
+	<select id='select-climate-zone-id' class="form-select" aria-label="Default select example" onchange="updateClimateZone(this)">
+	  <option value="0" selected>Cool</option>
+	  <option value="1">Temperate</option>
+	  <option value="2">Arid</option>
+	  <option value="3">Semi-arid</option>
+	  <option value="4">Sub-Tropical</option>
+	  <option value="5">Tropical</option>
+	</select>
+<div id='climateTick0' style='display: none;'><svg class='checkmark' id='climateTick1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 52'><circle class='checkmark__circle' id='climateTick2' cx='26' cy='26' r='25' fill='none'/> <path class='checkmark__check' id='climateTick3' fill='none' d='M14.1 27.2l7.1 7.2 16.7-16.8'/></svg></div>
+	</div>
+	<div class='location-form-details col-md-6'>
+		<h3>Where is your garden?</h3>
+		<p>This will be used to warn you of any weather events that might affect your garden like frost or lack of rain. If you don't add this, you won't get any weather notifications.</p>
 		<div class="form-header">Address Line 1</div>
 		<input type="search" class="form-input" id="addrs_1" placeholder="Search address here..."></input>
 
@@ -21,16 +46,22 @@
 
 		<div class="form-header">Postcode</div>
 		<input class="form-input" id="postcode"></input>
+
+		<div id='locationTick0' style='display: none;'><svg class='checkmark' id='locationTick1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 52'><circle class='checkmark__circle' id='locationTick2' cx='26' cy='26' r='25' fill='none'/> <path class='checkmark__check' id='locationTick3' fill='none' d='M14.1 27.2l7.1 7.2 16.7-16.8'/></svg></div>
 	</div>
-	<div class='col-md-6 location-form-details' id='gps-metadata'>
-	</div>
+
+	
 </div
-<br><hr><h2>What?</h2>
+<br><br><hr><h2>What do you want to grow?</h2><h3>Vegetables</h3>
 <div id="plant-names-div" class='row'></div>
-<div id='loading-progress-plant-names'></div><div id='loading-progress'></div><br><br><button class='my-button-class' onclick='saveSettings()'>Save</button><div id='save-progress'></div></div>
+<h3>Herbs</h3>
+<div id="herbs-names-div" class='row'></div>
+<h3>Fruit and Nut trees</h3>
+<div id="trees-names-div" class='row'></div>
+<div id='loading-progress-plant-names'></div><div id='loading-progress'></div><br><br><button class='my-button-class' onclick='saveSettings()'>Save</button><div id='saveTick0' style='display: none;'><svg class='checkmark' id='saveTick1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 52'><circle class='checkmark__circle' id='saveTick2' cx='26' cy='26' r='25' fill='none'/> <path class='checkmark__check' id='saveTick3' fill='none' d='M14.1 27.2l7.1 7.2 16.7-16.8'/></svg></div><div id='save-progress'></div></div>
 </div>
 </div>
-<br><script src='/js_components/meta_goal.js'></script><script src='/js_components/meta_plant_tick_box.js'></script><script src='/scripts/fetchApi.js'></script><script src='/scripts/user.js'></script><script src='/scripts/getUserInfoOnPageLoad.js'></script><script src='/scripts/isUserArea.js'/></script>
+<br><script src='/js_components/meta_goal.js'></script><script src='/js_components/meta_plant_tick_box.js'></script><script src='/js_components/meta_weatherDashboard.js'></script><script src='/scripts/fetchApi.js'></script><script src='/scripts/user.js'></script><script src='/scripts/getUserInfoOnPageLoad.js'></script><script src='/scripts/greenTick.js'></script><script src='/scripts/isUserArea.js'/></script>
 <script src='/scripts/userGardenSettings.js'/></script>
 <script> function onLoadAddInlineVariables() {document.getElementById('inline-var-id-0').textContent = user.name;}</script>
 </div><div id='main-page-loader'></div></body></html>

@@ -5,6 +5,18 @@
 #include "easy_string.h"
 #include "easy_files.h"
 
+char *nullTerminateBuffer(char *result, char *string, int length) {
+    for(int i = 0; i < length; ++i) {
+        result[i]= string[i];
+    }
+    result[length] = '\0';
+    return result;
+}
+
+#define nullTerminate(string, length) nullTerminateBuffer((char *)malloc(length + 1), string, length)
+#define nullTerminateArena(string, length, arena) nullTerminateBuffer((char *)pushArray(arena, length + 1, char), string, length)
+
+
 typedef struct {
 	//NOTE: ID is the index in the array
 	char *name;
@@ -503,6 +515,12 @@ static void writeFooter(FileState *state) {
 	sizeInBytes = easyString_getSizeInBytes_utf8(javascriptStr);
 	addElementInifinteAllocWithCount_(&state->contentsToWrite, javascriptStr, sizeInBytes);
 
+	javascriptStr = "<script src='/scripts/greenTick.js'></script>";
+
+	sizeInBytes = easyString_getSizeInBytes_utf8(javascriptStr);
+	addElementInifinteAllocWithCount_(&state->contentsToWrite, javascriptStr, sizeInBytes);
+
+
 	
 	//NOTE: Add any other javascript functions
 	for(int i = 0; i < state->jsFilesToAddInFooter.count; ++i) {
@@ -962,7 +980,61 @@ int main(int argc, char **args) {
 
 				// 	eatWhiteSpace(&at);
 
+				} else if(stringsMatchNullN("#GREEN_TICK", at, 11)) { //NOTE(ollie): <a> tag with green background
+					at += 11;
+
+					eatWhiteSpace_justSpaces(&at);
+
+					char *prevAt = at;
+					//get the id name
+					while(*at != ' ' && *at != '\r' && *at != '\n'&& *at != '\0') {
+						at++;
+					}
+
+					u32 stringSize = ((size_t)at - (size_t)prevAt);
+
+
+					char *idName = nullTerminate(prevAt, stringSize);
+
+
+
+					writeText(&state, "<div id='");
+
+					char *id0 = concat(idName, "0");
+					addElementInifinteAllocWithCount_(&state.contentsToWrite, id0, easyString_getSizeInBytes_utf8(id0));
+
+					writeText(&state, "' style='display: none;'>");
+
+					writeText(&state, "<svg class='checkmark' id='");
+
+					id0 = concat(idName, "1");
+					addElementInifinteAllocWithCount_(&state.contentsToWrite, id0, easyString_getSizeInBytes_utf8(id0));
 					
+					writeText(&state, "' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 52'>");
+
+					eatWhiteSpace_justSpaces(&at);
+
+					writeText(&state, "<circle class='checkmark__circle' id='");
+
+					id0 = concat(idName, "2");
+					addElementInifinteAllocWithCount_(&state.contentsToWrite, id0, easyString_getSizeInBytes_utf8(id0));
+
+					writeText(&state, "' cx='26' cy='26' r='25' fill='none'/>");
+
+					eatWhiteSpace_justSpaces(&at);
+
+					writeText(&state, " <path class='checkmark__check' id='");
+
+					id0 = concat(idName, "3");
+					addElementInifinteAllocWithCount_(&state.contentsToWrite, id0, easyString_getSizeInBytes_utf8(id0));
+
+					writeText(&state, "' fill='none' d='M14.1 27.2l7.1 7.2 16.7-16.8'/>");
+
+					eatWhiteSpace_justSpaces(&at);
+
+					writeText(&state, "</svg></div>");
+
+					eatWhiteSpace(&at);
 				
 				} else if(stringsMatchNullN("#BUTTON", at, 7)) { //NOTE(ollie): <a> tag with green background
 					at += 7;

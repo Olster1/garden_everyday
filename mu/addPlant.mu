@@ -28,6 +28,16 @@
 ###Tropical
 #INPUT trop_year_to_plant_input text margin-left: 0; margin-right: 0;
 
+#HTML
+<h3>Plant Type</h3>
+<select id='plant_type_dropdown' class="form-select" aria-label="Default select example">
+  <option value="0" selected>Vegetable</option>
+  <option value="1">Herb</option>
+  <option value="2">Tree</option>
+</select>
+
+#ENDHTML
+
 #DIV loading-progress 
 
 #BUTTON AddPlant() Add Plant

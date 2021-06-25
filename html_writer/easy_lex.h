@@ -85,6 +85,7 @@ FUNC(TOKEN_GREATER_THAN)\
 FUNC(TOKEN_LESS_THAN)\
 FUNC(TOKEN_GREATER_THAN_OR_EQUAL_TO)\
 FUNC(TOKEN_LESS_THAN_OR_EQUAL_TO)\
+FUNC(TOKEN_SINGLE_APOSTROPHE)\
 
 
 typedef enum {
@@ -205,7 +206,8 @@ void lexPrintToken(EasyToken *token) {
     printf("%s\n%s\n---\n", a, LexTokenTypeStrings[token->type]);
 }
 
-EasyToken lexGetToken_(EasyTokenizer *tokenizer, bool advanceWithToken) {
+
+EasyToken lexGetToken_(EasyTokenizer *tokenizer, bool advanceWithToken, bool ignoreSingleQuotationAsString) {
     char *at = tokenizer->src;
     int *lineNumber = &tokenizer->lineNumber;
     EasyToken token = lexInitToken(TOKEN_UNINITIALISED, at, 1, *lineNumber);
@@ -318,18 +320,23 @@ EasyToken lexGetToken_(EasyTokenizer *tokenizer, bool advanceWithToken) {
         } break;
         case '\'': 
         case '\"': {
-            token = lexInitToken(TOKEN_STRING, at, 1, *lineNumber);
-            char endOfString = (*at == '\"') ? '\"' : '\'';
-            at++;
-            while(*at && *at != endOfString) {
-                if(lexIsNewLine(*at)) {
-                    //NOTE(ollie): Advance the line number
-                    *lineNumber = *lineNumber + 1;
-                }
+            if(ignoreSingleQuotationAsString && *at == '\'') {
+                token = lexInitToken(TOKEN_SINGLE_APOSTROPHE, at, 1, *lineNumber);
                 at++;
+            } else {
+                token = lexInitToken(TOKEN_STRING, at, 1, *lineNumber);
+                char endOfString = (*at == '\"') ? '\"' : '\'';
+                at++;
+                while(*at && *at != endOfString) {
+                    if(lexIsNewLine(*at)) {
+                        //NOTE(ollie): Advance the line number
+                        *lineNumber = *lineNumber + 1;
+                    }
+                    at++;
+                }
+                if(*at == endOfString) at++;
+                token.size = (at - token.at);//quotation are kept with the value
             }
-            if(*at == endOfString) at++;
-            token.size = (at - token.at);//quotation are kept with the value
         } break;
         case '/': {
             token = lexInitToken(TOKEN_FORWARD_SLASH, at, 1, *lineNumber);
@@ -457,7 +464,9 @@ EasyToken lexGetToken_(EasyTokenizer *tokenizer, bool advanceWithToken) {
     return token;
 }
 
-#define lexGetNextToken(tokenizer) lexGetToken_(tokenizer, true)
-#define lexSeeNextToken(tokenizer) lexGetToken_(tokenizer, false)
+#define lexGetNextToken(tokenizer) lexGetToken_(tokenizer, true, false)
+#define lexSeeNextToken(tokenizer) lexGetToken_(tokenizer, false, false)
+#define lexGetNextToken_ignoreSingleQuotationAsString(tokenizer) lexGetToken_(tokenizer, true, true)
+
 
 

@@ -6,11 +6,19 @@ let onFinishLoad = [];
 function makeUserNavBar() {
   let navList = document.getElementById('my-navbar-id');
 
-  let li = document.createElement("li");
+  let li2 = document.createElement("li");
+  li2.innerHTML = "<a href=\"/user\">Your Dashboard</a>";
+  navList.appendChild(li2);
 
+  let li1 = document.createElement("li");
+  li1.innerHTML = "<a href=\"/userSettings\">Your Settings</a>";
+  navList.appendChild(li1);
+
+  let li = document.createElement("li");
   li.innerHTML = "<a href=\"javascript:logoutUser();\">Logout</a></li>;"; 
-  
   navList.appendChild(li);
+
+
 }
 
 function makeNonUserNavBar() {

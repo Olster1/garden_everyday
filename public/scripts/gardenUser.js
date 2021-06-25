@@ -82,9 +82,12 @@ function checkWeather(lat, long) {
 
   let request = buildGetRequest('https://api.openweathermap.org/data/2.5/weather?lat=' + lat + '&lon=' + long + '&appid=3a83cfadb21fb56f624d7136e09551b0');
 
-  sendRequest(request, (data) => {
+  sendRequest(request, (weatherData) => {
+      
+
+      let iconImg = 'http://openweathermap.org/img/wn/' + weatherData.weather[0].icon + '@2x.png';
       const warningsDivParent = document.getElementById('warnings');
-      warningsDivParent.innerHTML = "It's " + (data.main.temp - 273).toFixed(2) + " degrees celcius today";
+      meta_create_weatherDashboard(warningsDivParent, (weatherData.main.temp - 273).toFixed(2), iconImg);
   }, 1);
   
 

@@ -176,7 +176,8 @@ router.post('/register', checkNoToken, (req, httpRes, next) => {
 				password: password,
 				email: email,
 				verificationHash: verificationHash, 
-				accountVerified: false
+				accountVerified: false,
+				setUpProfile: false
 			});
 
 			newUser.save((err2, result) => {
@@ -208,8 +209,8 @@ router.post('/register', checkNoToken, (req, httpRes, next) => {
 					}
 					if(documentResult == null) { //found the settings
 
-						userSet.save((err2, result) => {
-							if(err2) {
+						userSet.save((err3, result) => {
+							if(err3) {
 								httpRes.json({
 									result: constants.ERROR,
 									data: {},

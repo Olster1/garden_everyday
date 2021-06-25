@@ -93,7 +93,13 @@ function login() {
 		if(result === "ERROR" || result === "FAILED") {
 			loadingDiv.innerHTML = message;
 		} else {
-			routerGoTo('/user');
+			if(!userData.setUpProfile || userData.setUpProfile === 'undefined') {
+				//NOTE: Prompt user to set up their profile
+				routerGoTo('/userSettings');
+			} else {
+				routerGoTo('/user');	
+			}
+			
 		}
 	});
 }
