@@ -43,7 +43,7 @@ function sendRequest(request, callback, dataCount) {
 	.then(handle500Error)
 	.then((resp) => resp.json())
 	.then((data) => {
-		console.log(data);
+		// console.log(data);
 		if(dataCount === 1) {
 			callback(data);	
 		} else {

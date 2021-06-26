@@ -78,16 +78,113 @@ function getPlantInfos(infosArray) {
   });
 }
 
+
+let lastFiveDaysRainFall = [0, 0, 0, 0, 0];
+let callbackCount = 0;
+
+function checkCallBackDone() {
+  if(callbackCount == 6) {
+    //finsihed
+
+    //NOTE: Create previous rainfall chart
+    
+    let xValues = ["Yesterday", "2 Days Ago", "3 Days Ago", "4 Days Ago", "5 Days Ago"];
+    let yValues = lastFiveDaysRainFall;
+    let barColors = ["blue", "blue","blue","blue","blue"];
+
+    new Chart("rainfallChart", {
+      type: "bar",
+      data: {
+        labels: xValues,
+        datasets: [{
+          backgroundColor: barColors,
+          data: yValues
+        }]
+      },
+      options: {
+        legend: {display: false},
+        title: {
+          display: true,
+          text: "Previous 5 day rainfall in millimeters"
+        }
+      }
+    });
+
+    //NOTE: Zero is the initial value
+    let totalRainFall = lastFiveDaysRainFall.reduce((a, b) => a + b, 0);
+
+
+    let totalRainDiv = document.getElementById('totalRainfall-id');
+    totalRainDiv.textContent = totalRainFall + "mm Total Rain Fall for the previous last 5 days."
+    console.log(totalRainFall);
+
+  }
+}
+
+function getWeatherForPreviousFiveDays(lat, long) {
+  const millsecondsPerDay = 1000*60*60*24;
+  let thisTime = new Date();
+
+  for(let dayIndex = 0; dayIndex < 5; ++dayIndex) {
+    thisTime -= millsecondsPerDay;
+    const time = ~~(+thisTime / 1000); //Converts from millseconds to seconds
+
+    const timeMachine = "https://api.openweathermap.org/data/2.5/onecall/timemachine?lat=" + lat + "&lon=" + long +  "&dt=" + time + "&appid=3a83cfadb21fb56f624d7136e09551b0";
+
+    let request = buildGetRequest(timeMachine);
+
+    sendRequest(request, (weatherData) => {
+
+        let totalMillimeters = 0;
+
+        //NOTE: Loop through the hours 
+        for(let hourIndex = 0; hourIndex < 24; ++hourIndex) {
+          // console.log(weatherData);
+          if(typeof(weatherData.hourly[hourIndex].rain) !== 'undefined') {
+              let rainMM = weatherData.hourly[hourIndex].rain['1h'];
+              // console.log(rainMM);
+              totalMillimeters += rainMM;
+          }
+        }
+
+        lastFiveDaysRainFall[dayIndex] = totalMillimeters;
+
+        callbackCount++;
+
+        checkCallBackDone();
+
+    }, 1);
+  }
+}
+
 function checkWeather(lat, long) {
 
-  let request = buildGetRequest('https://api.openweathermap.org/data/2.5/weather?lat=' + lat + '&lon=' + long + '&appid=3a83cfadb21fb56f624d7136e09551b0');
+  // NOTE: OLD one that didn't have forecast or previous days
+  // let request = buildGetRequest('https://api.openweathermap.org/data/2.5/weather?lat=' + lat + '&lon=' + long + '&appid=3a83cfadb21fb56f624d7136e09551b0');
+  let request = buildGetRequest('https://api.openweathermap.org/data/2.5/onecall?lat=' + lat + '&lon=' + long + '&appid=3a83cfadb21fb56f624d7136e09551b0');
 
+ 
+
+  //NOTE: For 5 days get the weather data we need
+  getWeatherForPreviousFiveDays(lat, long);
+  
+ 
   sendRequest(request, (weatherData) => {
-      
 
-      let iconImg = 'http://openweathermap.org/img/wn/' + weatherData.weather[0].icon + '@2x.png';
+      let iconImg = 'http://openweathermap.org/img/wn/' + weatherData.current.weather[0].icon + '@2x.png';
       const warningsDivParent = document.getElementById('warnings');
-      meta_create_weatherDashboard(warningsDivParent, (weatherData.main.temp - 273).toFixed(2), iconImg);
+
+      console.log(weatherData);
+
+      let suburb = userGardenSettings.suburb;
+      meta_create_weatherDashboard(warningsDivParent, (weatherData.current.temp - 273).toFixed(2), suburb, iconImg, weatherData.daily[0].rain);
+
+      callbackCount++;
+      console.log("created dashboard");
+      /////////////////////////////
+      checkCallBackDone();
+
+
   }, 1);
   
 

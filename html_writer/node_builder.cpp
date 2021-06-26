@@ -41,6 +41,8 @@ struct HtmlNode {
 	int typeCount;
 	char *types[2];
 
+	int idCount;
+	SrcInfo ids[1];
 		
 	//NOTE: 1 Dimensional tree to pop back up to last parent
 	HtmlNode *parent;
@@ -78,6 +80,15 @@ static void pushSrc(HtmlNode *node, char *name, bool isVar) {
 	srcInfo.isVar = isVar;
 
 	node->srcs[node->srcCount++] = srcInfo;
+}
+
+static void pushId(HtmlNode *node, char *name, bool isVar) {
+	assert(node->idCount < arrayCount(node->ids));
+	SrcInfo srcInfo;
+	srcInfo.str = name;
+	srcInfo.isVar = isVar;
+
+	node->ids[node->idCount++] = srcInfo;
 }
 
 
@@ -343,6 +354,37 @@ int main(int argc, char **args) {
     						addElementInifinteAllocWithCount_(&state.contentsToWrite, str, easyString_getSizeInBytes_utf8(str));
     		    				
     		    		}
+
+    		    		for(int i = 0; i < openNode->idCount; ++i) {
+    		    			char *str = "element";
+    		    			addElementInifinteAllocWithCount_(&state.contentsToWrite, str, easyString_getSizeInBytes_utf8(str));
+
+    		    			//Unique element id
+    		    			char strBuffer[512];
+    		    			sprintf_s(strBuffer, arrayCount(strBuffer), "%d", state.elementCount);
+    		    			addElementInifinteAllocWithCount_(&state.contentsToWrite, strBuffer, easyString_getSizeInBytes_utf8(strBuffer));
+
+    		    			str = ".id = ";
+    		    			addElementInifinteAllocWithCount_(&state.contentsToWrite, str, easyString_getSizeInBytes_utf8(str));
+
+    		    			SrcInfo srcInfo = openNode->ids[i];
+    		    			if(!srcInfo.isVar) {
+    		    				str = "\"";
+    		    				addElementInifinteAllocWithCount_(&state.contentsToWrite, str, easyString_getSizeInBytes_utf8(str));
+    		    			}
+
+    		    			str = srcInfo.str;
+    		    			addElementInifinteAllocWithCount_(&state.contentsToWrite, str, easyString_getSizeInBytes_utf8(str));
+    						
+    						if(!srcInfo.isVar) {
+    							str = "\"";
+    							addElementInifinteAllocWithCount_(&state.contentsToWrite, str, easyString_getSizeInBytes_utf8(str));
+    						}
+
+    						str = ";\n";
+    						addElementInifinteAllocWithCount_(&state.contentsToWrite, str, easyString_getSizeInBytes_utf8(str));
+    		    				
+    		    		}	
 
     		    		for(int i = 0; i < openNode->srcCount; ++i) {
     		    			char *str = "element";
@@ -621,6 +663,43 @@ int main(int argc, char **args) {
 		    				}
 		    				
 		    				pushSrc(openNode, name, isVar);
+
+		    			} else if(stringsMatchNullN("id", token.at, token.size)) {
+		    				//NOTE: Get the src
+		    				EasyToken token = lexGetNextToken(&tokenizer);
+		    				assert(token.type == TOKEN_EQUALS);
+
+		    				token = lexGetNextToken(&tokenizer);
+
+		    				bool isVar = false;
+		    				char *name = 0;
+		    				if(token.type == TOKEN_STRING) {
+		    					name = nullTerminate(token.at, token.size);
+		    				} else if(token.type == TOKEN_OPEN_BRACKET) {
+		    					token = lexGetNextToken(&tokenizer);
+
+		    					isVar = true;
+
+		    					char *at = token.at;
+
+		    					while(*at != '\0' && *at != '}') { //NOTE: Keep going till you hit an end curly brace
+		    						at++;
+		    					}
+
+		    					name = nullTerminate(token.at, (at - token.at));
+
+		    					if(*at == '}') {
+		    						at++;
+		    					}
+
+		    					tokenizer.src = at;
+		    					
+		    					pushInputVar(&state, name);
+		    				} else {
+		    					assert(false);
+		    				}
+		    				
+		    				pushId(openNode, name, isVar);
 
 		    			} else if(stringsMatchNullN("checked", token.at, token.size)) {
 		    				//NOTE: Get the src

@@ -91,10 +91,27 @@ Remember that you can often extend the range of plants that you can grow by crea
 
 #BR
 #BR
+#HTML
+<div class='row'>
+<div class='col-md-6'>
+#ENDHTML
+
 #BUTTON saveSettings() Save
 #GREEN_TICK saveTick
 #DIV save-progress 
 
+#HTML
+</div>
+<div class='col-md-6'>
+#ENDHTML
+
+
+#BUTTON settings_goToUserDashboard() Get Gardening! →
+
+#HTML
+</div>
+</div>
+#ENDHTML
 
 #JAVASCRIPT isUserArea
 #JAVASCRIPT userGardenSettings

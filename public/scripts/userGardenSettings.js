@@ -111,6 +111,10 @@ function getUserSettings() {
   });
 } 
 
+function settings_goToUserDashboard() {
+    routerGoTo('/user');
+}
+
 function saveSettings() {
     startLoadingSpinner("save-progress");
 

@@ -1,6 +1,6 @@
 
 #CARD
-#TITLE Let's Get Gardening!
+#TITLE Let's Get Gardening! 🌱
 
 ##Welcome Back {user.name}
 
