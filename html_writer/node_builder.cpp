@@ -849,7 +849,7 @@ int main(int argc, char **args) {
 			    		char *str = ".appendChild(document.createTextNode(\"";
 			    		addElementInifinteAllocWithCount_(&state.contentsToWrite, str, easyString_getSizeInBytes_utf8(str));
 
-
+			    		
 			    		addElementInifinteAllocWithCount_(&state.contentsToWrite, token.at, (token.size));
 
 			    		str = "\"));\n";

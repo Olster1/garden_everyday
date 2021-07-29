@@ -1,6 +1,15 @@
 <div>
-<p>It's {temperature} degrees celcius today in {suburb} <img src={weatherIconStr}></p>
-<p>The predicted rainfall today is {rainfall} millimeters</p>
+<p>It's <b>{temperature}</b> degrees celcius today in {suburb} <img src={weatherIconStr}></p>
+<p>The predicted rainfall today is <b>{rainfall}</b> millimeters</p>
 <canvas id="rainfallChart" style="width:100%;max-width:700px;"></canvas>
 <p id='totalRainfall-id'></p>
+<canvas id="cloudChart" style="width:100%;max-width:700px;"></canvas>
+<ul>
+<li>few clouds: 11-25%</li>
+<li>scattered clouds: 25-50%</li>
+<li>broken clouds: 51-84%</li>
+<li>overcast clouds: 85-100%</li>
+</ul>
+<canvas id="futureRainfallChart" style="width:100%;max-width:700px;"></canvas>
+<canvas id="futureCloudChart" style="width:100%;max-width:700px;"></canvas>
 </div>

@@ -1108,6 +1108,10 @@ int main(int argc, char **args) {
 							if(stringsMatchNullN("#ENDHTML", at, 8)) {
 								at += 8;
 								looking = false;
+							} else {
+								//Add the hashtag
+								addElementInifinteAllocWithCount_(&state.contentsToWrite, at, 1);
+								at++;	
 							}
 						} else {
 							addElementInifinteAllocWithCount_(&state.contentsToWrite, at, 1);

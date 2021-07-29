@@ -79,7 +79,12 @@ function getPlantInfos(infosArray) {
 }
 
 
+let nextFiveDaysRainFall = [0, 0, 0, 0, 0, 0];
+let frostDays = [false, false, false, false, false, false];
+let nextFiveDaysCloudCover = [0, 0, 0, 0, 0, 0];
+let lastFiveDaysCloudCover = [0, 0, 0, 0, 0];
 let lastFiveDaysRainFall = [0, 0, 0, 0, 0];
+let lastFiveDaysCloudCover_color = ["yellow", "yellow", "yellow", "yellow", "yellow"];
 let callbackCount = 0;
 
 function checkCallBackDone() {
@@ -90,7 +95,7 @@ function checkCallBackDone() {
     
     let xValues = ["Yesterday", "2 Days Ago", "3 Days Ago", "4 Days Ago", "5 Days Ago"];
     let yValues = lastFiveDaysRainFall;
-    let barColors = ["blue", "blue","blue","blue","blue"];
+    let barColors = ["#D96731", "#D96731","#D96731","#D96731","#D96731"];
 
     new Chart("rainfallChart", {
       type: "bar",
@@ -115,8 +120,54 @@ function checkCallBackDone() {
 
 
     let totalRainDiv = document.getElementById('totalRainfall-id');
-    totalRainDiv.textContent = totalRainFall + "mm Total Rain Fall for the previous last 5 days."
+    totalRainDiv.innerHTML = '<b>' + totalRainFall.toFixed(2) + "</b> millimeters Total Rain Fall for the previous last 5 days."
     console.log(totalRainFall);
+
+    ////////////////////////////////////
+
+
+    //NOTE: Create previous cloud chart
+
+    xValues = ["Yesterday", "2 Days Ago", "3 Days Ago", "4 Days Ago", "5 Days Ago"];
+    yValues = lastFiveDaysCloudCover;
+    barColors = ["#D96731", "#D96731","#D96731","#D96731","#D96731"];
+
+    new Chart("cloudChart", {
+      type: "bar",
+      data: {
+        labels: xValues,
+        datasets: [{
+          backgroundColor: barColors,
+          data: yValues
+        }]
+      },
+      options: {
+        legend: {display: false},
+        title: {
+          display: true,
+          text: "Previous 5 day average cloud cover in %"
+        },
+        scales: {
+          yAxes: [{
+                  display: true,
+                  scaleLabel: {
+                      display: true,
+                      labelString: 'Cloud Percent (%)'
+                  },
+                  ticks: {
+                      beginAtZero: true,
+                      steps: 10,
+                      max: 100
+                  }
+              }]
+        }
+      }
+    });
+
+
+    
+
+    ///////////////////////////////////////////
 
   }
 }
@@ -136,6 +187,8 @@ function getWeatherForPreviousFiveDays(lat, long) {
     sendRequest(request, (weatherData) => {
 
         let totalMillimeters = 0;
+        let totalCloudPercent = 0;
+        let dayCount = 0;
 
         //NOTE: Loop through the hours 
         for(let hourIndex = 0; hourIndex < 24; ++hourIndex) {
@@ -145,9 +198,39 @@ function getWeatherForPreviousFiveDays(lat, long) {
               // console.log(rainMM);
               totalMillimeters += rainMM;
           }
+
+          //NOTE: To calculate the average
+          
+
+          //NOTE: Get the cloud cover
+          if(typeof(weatherData.hourly[hourIndex].clouds) !== 'undefined') {
+              let cloudPercent = weatherData.hourly[hourIndex].clouds;
+              // console.log(rainMM);
+              totalCloudPercent += cloudPercent;
+              dayCount++;
+          }
         }
 
+        // console.log(weatherData);
         lastFiveDaysRainFall[dayIndex] = totalMillimeters;
+        lastFiveDaysCloudCover[dayIndex] = (totalCloudPercent / dayCount);
+
+        let cloudVal = lastFiveDaysCloudCover[dayIndex];
+        // let color = rgba(255, 0, 0, 1);
+
+        // if(cloudVal >= 11 && cloudVal < 25) {
+        //   color = rgba(255, 0, 0, 0.2);
+        // } else if(cloudVal >= 25 && cloudVal < 50) {
+
+        // } else if(cloudVal >= 50 && cloudVal < 85) {
+
+        // } else if(cloudVal >= 85 && cloudVal < 100) {
+
+        // }
+
+
+
+        // lastFiveDaysCloudCover_color[dayIndex] = color;
 
         callbackCount++;
 
@@ -176,17 +259,158 @@ function checkWeather(lat, long) {
 
       console.log(weatherData);
 
+      let rainfall = 0;
+
+      if(typeof(weatherData.daily[0].rain) !== 'undefined') {
+        rainfall = weatherData.daily[0].rain;
+      }
+
+
+      for(let dayIndex = 0; dayIndex < 6; ++dayIndex) {
+          if(typeof(weatherData.daily[dayIndex].rain) !== 'undefined') {
+            nextFiveDaysRainFall[dayIndex] = weatherData.daily[dayIndex].rain;
+          }
+
+          if(typeof(weatherData.daily[dayIndex].clouds) !== 'undefined') {
+            nextFiveDaysCloudCover[dayIndex] = weatherData.daily[dayIndex].clouds;
+          }
+
+          let cloudCover = nextFiveDaysCloudCover[dayIndex];
+
+          let rainfall = nextFiveDaysRainFall[dayIndex];
+
+          let temp = 100;
+
+          if(typeof(weatherData.daily[dayIndex].temp) !== 'undefined') {
+            temp = weatherData.daily[dayIndex].temp.min - 273.0;
+          }
+
+          //cloud percentage < 10% , no rain, below 5 degrees
+          if(cloudCover < 0.1 && rainfall < 1 && temp < 5) {
+            frostDays[dayIndex] = true;
+
+
+          }         
+      }
+
+
+      let today = weatherData.daily[0];
+
+      // today.moon_phase - plant by moon phase
+      // today.pressure
+      // today.rain
+      // today.dew_point
+      // today.humidity
+      // today.pop
+      // wind_deg: 149
+      // wind_gust: 7.26
+      // wind_speed: 5.01
+
+      // temp:
+      // day: 295.1
+      // eve: 294.71
+      // max: 295.55
+      // min: 293.94
+      // morn: 294.01
+      // night: 294.24
+ 
       let suburb = userGardenSettings.suburb;
-      meta_create_weatherDashboard(warningsDivParent, (weatherData.current.temp - 273).toFixed(2), suburb, iconImg, weatherData.daily[0].rain);
+      meta_create_weatherDashboard(warningsDivParent, (weatherData.current.temp - 273).toFixed(2), suburb, iconImg, rainfall.toFixed(2));
 
       callbackCount++;
       console.log("created dashboard");
       /////////////////////////////
       checkCallBackDone();
 
+      //RAIN FALL 
+
+      let xValues = ["Today", "Tomorrow", "2 Days From Now", "3 Days From Now", "4 Days From Now", "5 Days From Now"];
+      let yValues = nextFiveDaysRainFall;
+      let barColors = ["#ffff99", "#ffff99","#ffff99","#ffff99","#ffff99", "#ffff99"];
+
+      new Chart("futureRainfallChart", {
+        type: "bar",
+        data: {
+          labels: xValues,
+          datasets: [{
+            backgroundColor: barColors,
+            data: yValues
+          }]
+        },
+        options: {
+          legend: {display: false},
+          title: {
+            display: true,
+            text: "Next 6 day rainfall in millimeters"
+          },
+          scales: {
+            yAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Rainfall (mm)'
+                    },
+                }]
+          }
+        }
+      });
+
+
+      ////////////////////////////////////
+
+
+      //NOTE: CLOUDS
+
+      xValues = ["Today", "Tomorrow", "2 Days From Now", "3 Days From Now", "4 Days From Now", "5 Days From Now"];
+      yValues = nextFiveDaysCloudCover;
+      
+
+      new Chart("futureCloudChart", {
+        type: "bar",
+        data: {
+          labels: xValues,
+          datasets: [{
+            backgroundColor: barColors,
+            data: yValues
+          }]
+        },
+        options: {
+          legend: {display: false},
+          title: {
+            display: true,
+            text: "Next 6 day average cloud cover in %"
+          },
+          scales: {
+            yAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Cloud Percent (%)'
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        steps: 10,
+                        max: 100
+                    }
+                }]
+          }
+        }
+      });
+
+      ///////////////////////////////////////////
+
+      frostDays.map((day, index) => {
+        // if(day) 
+        {
+          meta_create_frost_warning(warningsDivParent, index);
+        }
+      });
+
 
   }, 1);
-  
+
+
+
 
 }
 

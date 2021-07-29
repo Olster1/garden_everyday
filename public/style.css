@@ -209,6 +209,15 @@ h4 {
 }
 
 
+.frost-warning {
+  border-radius: 0.2cm;
+  box-shadow: 0.1cm 0.1cm 0.1cm 0.1cm  #F0F0F0;
+  margin: 1cm;
+  padding: 0.5cm;
+
+  background-color: #ffcccb;
+}
+
 
 /*////////////////////// START OF THE GREEN CHECK MARK ////////////////////////////////////*/
 /*Green Check mark to say you completed part of the form*/

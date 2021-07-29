@@ -15,7 +15,11 @@ bool lexIsNumeric(char charValue) {
 }
 
 bool lexIsAlphaNumeric(char charValue) {
-    bool result = ((charValue >= 'A' && charValue <= 'Z') || (charValue >= 'a' && charValue <= 'z') || charValue == '_');
+
+    //NOTE: This lets us handle unicode strings
+    bool isUnicode = easyUnicode_isContinuationByte(charValue) || easyUnicode_isLeadingByte(charValue);
+
+    bool result = ((charValue >= 'A' && charValue <= 'Z') || (charValue >= 'a' && charValue <= 'z') || charValue == '_' || isUnicode);
     return result;
 }
 
