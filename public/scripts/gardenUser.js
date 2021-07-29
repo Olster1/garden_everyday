@@ -288,8 +288,6 @@ function checkWeather(lat, long) {
           //cloud percentage < 10% , no rain, below 5 degrees
           if(cloudCover < 0.1 && rainfall < 1 && temp < 5) {
             frostDays[dayIndex] = true;
-
-
           }         
       }
 
@@ -400,8 +398,7 @@ function checkWeather(lat, long) {
       ///////////////////////////////////////////
 
       frostDays.map((day, index) => {
-        // if(day) 
-        {
+        if(day) {
           meta_create_frost_warning(warningsDivParent, index);
         }
       });
