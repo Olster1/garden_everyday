@@ -93,7 +93,7 @@ function login() {
 		if(result === "ERROR" || result === "FAILED") {
 			loadingDiv.innerHTML = message;
 		} else {
-			if(!userData.setUpProfile || userData.setUpProfile === 'undefined') {
+			if(!data.userSetup || data.userSetup === 'undefined') {
 				//NOTE: Prompt user to set up their profile
 				routerGoTo('/userSettings');
 			} else {

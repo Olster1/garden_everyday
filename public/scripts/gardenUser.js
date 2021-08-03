@@ -79,6 +79,8 @@ function getPlantInfos(infosArray) {
 }
 
 
+let gardenTips = ["Soaking seeds for 24hrs prior to planting can help germination success.", "Planting your garden north facing without any trees blocking the sun will give your garden an abundance of sunshine it needs to succeed."];
+
 let nextFiveDaysRainFall = [0, 0, 0, 0, 0, 0];
 let frostDays = [false, false, false, false, false, false];
 let nextFiveDaysCloudCover = [0, 0, 0, 0, 0, 0];
@@ -121,7 +123,6 @@ function checkCallBackDone() {
 
     let totalRainDiv = document.getElementById('totalRainfall-id');
     totalRainDiv.innerHTML = '<b>' + totalRainFall.toFixed(2) + "</b> millimeters Total Rain Fall for the previous last 5 days."
-    console.log(totalRainFall);
 
     ////////////////////////////////////
 
@@ -171,6 +172,9 @@ function checkCallBackDone() {
 
   }
 }
+
+let pastIsOpen = false;
+let futureIsOpen = false;
 
 function getWeatherForPreviousFiveDays(lat, long) {
   const millsecondsPerDay = 1000*60*60*24;
@@ -339,7 +343,7 @@ function checkWeather(lat, long) {
           legend: {display: false},
           title: {
             display: true,
-            text: "Next 6 day rainfall in millimeters"
+            text: "Next 5 day rainfall in millimeters"
           },
           scales: {
             yAxes: [{
@@ -376,7 +380,7 @@ function checkWeather(lat, long) {
           legend: {display: false},
           title: {
             display: true,
-            text: "Next 6 day average cloud cover in %"
+            text: "Next 5 day average cloud cover in %"
           },
           scales: {
             yAxes: [{
@@ -395,6 +399,20 @@ function checkWeather(lat, long) {
         }
       });
 
+
+      let pastDataBtn = document.getElementById('reveal-past-data');
+
+      let futureDataBtn = document.getElementById('reveal-future-data');
+
+      let prevData = document.getElementById('previous-rainfall-data');
+
+      let futureData = document.getElementById('future-rainfall-data');
+
+      pastDataBtn.onclick = () => { if(pastIsOpen) { prevData.style.display = 'none'; pastIsOpen = false; } else { pastIsOpen = true; prevData.style.display = 'block'; } }
+
+      futureDataBtn.onclick = () => { if(futureIsOpen) { futureData.style.display = 'none'; futureIsOpen = false; } else { futureIsOpen = true; futureData.style.display = 'block'; } }
+
+
       ///////////////////////////////////////////
 
       frostDays.map((day, index) => {
@@ -411,4 +429,26 @@ function checkWeather(lat, long) {
 
 }
 
+function showTiptoUser() {
+
+  let randomIndex = Math.floor(Math.random() * gardenTips.length); 
+  let tip = gardenTips[randomIndex];
+
+
+  const parent = document.getElementById('garden-tip-parent');
+
+  parent.innerHTML = '💡 ' + tip;
+
+
+  const slideInBlock = document.getElementById('tips-slide-in-id');
+
+  const btn = document.getElementById('close-garden-tips-btn');
+
+  btn.onclick = () => { slideInBlock.classList.add("tips-slide-out"); }
+
+
+
+}
+
 onFinishLoad.push(getUserSettings);
+onFinishLoad.push(showTiptoUser);

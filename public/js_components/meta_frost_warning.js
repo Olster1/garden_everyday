@@ -11,10 +11,9 @@ let element3 = document.createElement('b');
 element2.appendChild(element3);
 element3.appendChild(document.createTextNode("Warning"));
 element3.appendChild(document.createTextNode(":"));
-element2.appendChild(document.createTextNode(" "));
-element2.appendChild(document.createTextNode("Frost"));
-element2.appendChild(document.createTextNode(" "));
-element2.appendChild(document.createTextNode("❄️"));
+element3.appendChild(document.createTextNode("Frost"));
+element3.appendChild(document.createTextNode(" "));
+element3.appendChild(document.createTextNode("❄️"));
 
 let element4 = document.createElement('p');
 element1.appendChild(element4);

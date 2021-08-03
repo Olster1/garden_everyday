@@ -5,7 +5,7 @@
 #BR
 #HTML
 <div id="location-div">
-<img src='/images/Australian-Climate-Map.jpg'>
+<img style='width: 100%;' src='/images/Australian-Climate-Map.jpg'>
 
 <ul>
 <li><strong><img loading="lazy" title="Australian Climate Guide" src="https://www.gardenexpress.com.au/wp-content/uploads/2014/08/climate_tropical.gif" alt="Australian Climate Guide" width="15" height="10"> Tropical</strong> – hot humid summer .</li>

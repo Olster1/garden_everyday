@@ -30,6 +30,7 @@ function initUserSession(httpRes, documentResult) {
 			isLoggedIn: true,
 			email: documentResult.email,
 			name: documentResult.name,
+			userSetup: documentResult.setUpProfile,
 			_id: documentResult._id
 		},
 		message: 'you succesfully logged in',
